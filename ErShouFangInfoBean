@@ -1,0 +1,59 @@
+import re
+
+class ErShouFangInfoBean(object):
+    def __init__(self,detailUrl,title,houseAddressInfo,housePositionInfo,followInfo,tagInfo,priceInfo):
+        #详情url
+        self.detailUrl = detailUrl
+        #标题
+        self.title = title
+        #小区名
+        self.villageName = houseAddressInfo[0][1]
+        #小区url
+        self.villageDetailUrl = houseAddressInfo[0][0]
+        # 两种情况
+        # 5室2厅 | 168.11平米 | 北 | 精装 | 有电梯
+        # 5室1厅 | 178.75平米 | 南 北 | 其他
+        # 4室2厅 | 153.49平米 | 南 | 毛坯
+        tmpList = houseAddressInfo[0][2].lstrip()[1:].split("|")
+        #几室几厅
+        self.severalRoomsAndRooms = tmpList[0]
+        #平方米
+        self.squareMeter = tmpList[1]
+        #方位
+        self.direction = tmpList[2]
+        #精装 毛坯 简装
+        if tmpList[3].find("精装") or tmpList[3].find("简装") \
+            or tmpList[3].find("毛坯") or tmpList[3].find("其他"):
+            self.decorationStatus = tmpList[3]
+        else:
+            self.decorationStatus = None
+        #有无电梯
+        if len(tmpList) == 5:
+            if tmpList[4] == "有电梯":
+                self.hasElevator = 1
+            else:
+                self.hasElevator = 0
+        #楼层
+        self.floor = housePositionInfo[0]
+        #地区
+        self.area = housePositionInfo[2]
+        #地区url
+        self.areaUrl = housePositionInfo[1]
+        #关注人数
+        self.followCount = re.match('\d+',followInfo[0]).group(0)
+        #带看人数
+        self.hasVisitCount = re.match('\d+',followInfo[1]).group(0)
+        #发布时间
+        self.pulishTime = re.match("\d+(个月|年)",followInfo[2]).group(0)
+        #交通
+        self.subway = tagInfo[0][0]
+        #taxfree
+        self.taxfree = tagInfo[0][1]
+        #haskey
+        self.haskey = tagInfo[0][2]
+        #总价
+        self.amountPrice = priceInfo[0][0] + priceInfo[0][1]
+        #单价
+        self.price = priceInfo[0][2]
+
+
